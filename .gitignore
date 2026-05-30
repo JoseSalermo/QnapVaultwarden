@@ -3,3 +3,9 @@ data/
 backups/
 *.log
 .DS_Store
+
+# Exported Caddy CA cert — distribute out-of-band, never commit
+caddy-root.crt
+*.crt
+*.key
+*.pem
