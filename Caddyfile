@@ -1,6 +1,10 @@
 {
 	# Disable automatic public ACME; we serve over LAN/VPN only.
 	auto_https disable_redirects
+	# TLS clients omit SNI when connecting to an IP literal (RFC 6066), so
+	# Caddy can't pick a cert by name. Tell it which cert to serve when no
+	# SNI is sent — the QNAP IP — so browsing by IP works.
+	default_sni {$VAULT_HOST:127.0.0.1}
 }
 
 # Vault served on :8443 for both the QNAP hostname and its LAN IP.
