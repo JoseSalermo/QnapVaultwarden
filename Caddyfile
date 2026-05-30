@@ -3,10 +3,13 @@
 	auto_https disable_redirects
 }
 
-# Vault URL: https://qnap.local:8443
-# `tls internal` makes Caddy issue a cert from its own local CA.
-# Trust the root CA on each client device once (see docs/mobile-setup.md).
-qnap.local:8443 {
+# Vault served on :8443 for both the QNAP hostname and its LAN IP.
+# Reaching it by IP matters for VPN access: mDNS ".local" names don't
+# resolve across a VPN tunnel, but the private IP is routable.
+# `tls internal` issues a cert (covering every listed name) from Caddy's
+# own local CA. Trust that CA on each client once (docs/mobile-setup.md).
+# VAULT_HOST is the QNAP's LAN IP, supplied via the environment.
+https://qnap.local:8443, https://{$VAULT_HOST:127.0.0.1}:8443 {
 	tls internal
 
 	encode zstd gzip

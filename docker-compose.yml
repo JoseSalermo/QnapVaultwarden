@@ -34,6 +34,10 @@ services:
     image: caddy:2-alpine
     container_name: vaultwarden-caddy
     restart: unless-stopped
+    environment:
+      # QNAP LAN IP added as a cert SAN so the vault is reachable by IP
+      # (works on the LAN and over the VPN, unlike mDNS .local names).
+      VAULT_HOST: ${VAULT_HOST:-127.0.0.1}
     ports:
       - "${HTTPS_PORT:-8443}:8443"
     volumes:
