@@ -1,0 +1,15 @@
+{
+	# Disable automatic public ACME; we serve over LAN/VPN only.
+	auto_https disable_redirects
+}
+
+# Vault URL: https://qnap.local:8443
+# `tls internal` makes Caddy issue a cert from its own local CA.
+# Trust the root CA on each client device once (see docs/mobile-setup.md).
+qnap.local:8443 {
+	tls internal
+
+	encode zstd gzip
+
+	reverse_proxy vaultwarden:80
+}

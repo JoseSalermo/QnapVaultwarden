@@ -1,0 +1,53 @@
+services:
+  vaultwarden:
+    image: vaultwarden/server:latest
+    container_name: vaultwarden
+    restart: unless-stopped
+    environment:
+      DOMAIN: ${DOMAIN:-https://qnap.local:8443}
+      SIGNUPS_ALLOWED: ${SIGNUPS_ALLOWED:-false}
+      INVITATIONS_ALLOWED: ${INVITATIONS_ALLOWED:-true}
+      ADMIN_TOKEN: ${ADMIN_TOKEN}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_FROM: ${SMTP_FROM:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_SECURITY: ${SMTP_SECURITY:-starttls}
+      SMTP_USERNAME: ${SMTP_USERNAME:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      # Push notifications + websocket sync are enabled by default in
+      # recent Vaultwarden builds; no extra config needed here.
+    volumes:
+      - ./data:/data
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:80/alive"]
+      interval: 1m
+      timeout: 10s
+      retries: 3
+    networks:
+      - homelab
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: vaultwarden-caddy
+    restart: unless-stopped
+    ports:
+      - "${HTTPS_PORT:-8443}:8443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      - vaultwarden
+    networks:
+      - homelab
+
+networks:
+  homelab:
+    external: true
+    name: ${HOMELAB_DOCKER_NETWORK:-homelab}
+
+volumes:
+  caddy-data:
+    name: vaultwarden-caddy-data
+  caddy-config:
+    name: vaultwarden-caddy-config
