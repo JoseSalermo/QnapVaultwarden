@@ -23,7 +23,7 @@ services:
     volumes:
       - ./data:/data
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:80/alive"]
+      test: ["CMD", "/healthcheck.sh"]
       interval: 1m
       timeout: 10s
       retries: 3
